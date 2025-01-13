@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-import { getConnInfo } from 'hono/cloudflare-workers'
 
 const curlUserAgent = 'curl/7.81.0'
 const ipInfoUrl = 'https://ipinfo.io'
@@ -8,14 +7,14 @@ const app = new Hono()
 
 
 app.get('/', async (c) => {
-  const info = getConnInfo(c)
-  const ip = info.remote.address
+  const ip = c.env.remoteAddr.hostname
   if (!ip) {
     return c.text('No IP address found', 404)
   }
   const ipInfo = await fetch(`${ipInfoUrl}/${ip}`, {
     headers: {
       'User-Agent': curlUserAgent,
+      'Accept': 'text/html',
     },
   })
   const desc = await ipInfo.text()
@@ -42,4 +41,6 @@ ${desc}
   })
 })
 
-Deno.serve(app.fetch)
+Deno.serve((req, info) => {
+  return app.fetch(req, info)
+})
