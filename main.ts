@@ -11,19 +11,22 @@ app.get('/', async (c) => {
   if (!ip) {
     return c.text('No IP address found', 404)
   }
-  const ipInfo = await fetch(`${ipInfoUrl}/${ip}`, {
+  const link = `${ipInfoUrl}/${ip}`
+  const ipInfo = await fetch(link, {
     headers: {
       'User-Agent': curlUserAgent,
-      'Accept': 'text/html',
     },
   })
   const desc = await ipInfo.text()
   const rss = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
-<title>IP Info: ${ip}</title>
+<title>Your IP Info</title>
 <channel>
+  <title>IP Info: ${ip}</title>
+  <link>${c.req.url}</link>
   <item>
     <title>${ip}</title>
+    <link>${link}</link>
     <description>
     <pre>
     <code>  
