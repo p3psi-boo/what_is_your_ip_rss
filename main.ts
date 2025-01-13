@@ -8,7 +8,7 @@ const app = new Hono()
 
 
 app.get('/', async (c) => {
-  const info = await getConnInfo(c)
+  const info = getConnInfo(c)
   const ip = info.remote.address
   if (!ip) {
     return c.text('No IP address found', 404)
